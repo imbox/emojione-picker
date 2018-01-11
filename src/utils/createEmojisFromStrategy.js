@@ -27,7 +27,7 @@ export default function createEmojisFromStrategy(strategy) {
         }
       } else {
         // ensure the shortname is included as a keyword
-        if (!value.keywords.includes(key)) {
+        if (value.keywords && !value.keywords.includes(key)) {
           value.keywords.push(key);
         }
 

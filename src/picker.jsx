@@ -34,7 +34,7 @@ export default class Picker extends Component {
 
   state = {
     modifier: store.get("emoji-modifier") || "0",
-    frequentlyUsed: store.get('emoji-frequently-used') || [],
+    frequentlyUsed: store.get("emoji-frequently-used") || [],
     category: false,
     term: this.props.search !== true ? this.props.search : ""
   };
@@ -45,7 +45,8 @@ export default class Picker extends Component {
     each(this.props.emojione, (value, key) => {
       emojione[key] = value;
     });
-    this.setState({ emojis: {
+    this.setState({
+      emojis: {
         ...createEmojisFromStrategy(strategy),
         ...this.getFromFrequentlyUsed(strategy, this.state.frequentlyUsed)
       }
@@ -62,40 +63,49 @@ export default class Picker extends Component {
     }
   }
 
-  getFromFrequentlyUsed (strategy, frequentlyUsed) {
-    const emojis = {}
-    emojis['frequentlyUsed'] = {}
+  getFromFrequentlyUsed(strategy, frequentlyUsed) {
+    const emojis = {};
+    emojis["frequentlyUsed"] = {};
 
-    frequentlyUsed.sort((a, b) => b.used - a.used).slice(0, 21).forEach(frequentlyUsed => {
-      emojis['frequentlyUsed'][frequentlyUsed.strategyName] = [strategy[frequentlyUsed.strategyName]]
-    })
-    return emojis
+    frequentlyUsed
+      .sort((a, b) => b.used - a.used)
+      .slice(0, 21)
+      .forEach(frequentlyUsed => {
+        emojis["frequentlyUsed"][frequentlyUsed.strategyName] = [
+          strategy[frequentlyUsed.strategyName]
+        ];
+      });
+    return emojis;
   }
 
-  addToFrequentlyUsed (shortname) {
-    const strategyName = shortname.replace(/:/g, '')
-    const currentFrequentlyUsed = store.get('emoji-frequently-used') || []
+  addToFrequentlyUsed(shortname) {
+    const strategyName = shortname.replace(/:/g, "");
+    const currentFrequentlyUsed = store.get("emoji-frequently-used") || [];
     const newFrequentlyUsed = [
       ...currentFrequentlyUsed.filter(f => f.strategyName !== strategyName),
       {
         strategyName: strategyName,
-        used: (currentFrequentlyUsed.find(f => f.strategyName === strategyName) || {used: 0}).used + 1 % 6
+        used: (
+          (currentFrequentlyUsed.find(f => f.strategyName === strategyName) ||
+            { used: 0 }).used +
+            1 % 6
+        )
       }
-    ]
-    store.set('emoji-frequently-used', newFrequentlyUsed)
+    ];
+    store.set("emoji-frequently-used", newFrequentlyUsed);
     this.setState({
       frequentlyUsed: newFrequentlyUsed,
       emojis: {
         ...this.state.emojis,
         ...this.getFromFrequentlyUsed(strategy, newFrequentlyUsed)
       }
-    })
+    });
   }
 
-  onChange = (data) => {
-    this.addToFrequentlyUsed(data.shortname)
-    this.props.onChange(data)
-  }
+  onChange = data => {
+    this.addToFrequentlyUsed(data.shortname);
+    this.props.onChange(data);
+  };
 
   setFocus = ev => {
     if (ev.target.id === "flags") {
